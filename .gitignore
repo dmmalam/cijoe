@@ -1,6 +1,12 @@
 .DS_Store
-rdoc
+rdoc/*
+coverage/*
 pkg
 *.tmproj
 tmp/**/*
 tmp/*
+TODO
+edu/*
+.autotest
+.rvmrc
+Gemfile.lock

@@ -1,6 +1,6 @@
 require 'rubygems'
-require 'test/unit'
 require 'mocha'
+require 'test/unit'
 
 ENV['RACK_ENV'] = 'test'
 
@@ -41,7 +41,4 @@ end
 
 def create_tmpdir!(passed_dir = nil)
   FileUtils.mkdir_p(passed_dir || tmp_dir)
-end
-
-class Test::Unit::TestCase
 end

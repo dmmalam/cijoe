@@ -2,7 +2,7 @@ require "helper"
 require "rack/test"
 require "cijoe/server"
 
-class TestCIJoeServer < Test::Unit::TestCase
+class TestCIJoeServer < MiniTest::Unit::TestCase
   include Rack::Test::Methods
 
   class ::CIJoe
@@ -12,17 +12,18 @@ class TestCIJoeServer < Test::Unit::TestCase
   attr_accessor :app
 
   def setup
-    @app = CIJoe::Server.new
+    @app = CIJoe::Server
+    @app.joe = CIJoe.new(app.settings.project_path)
     joe = @app.joe
-    
+
     # make Build#restore a no-op so we don't overwrite our current/last
     # build attributes set from tests.
     def joe.restore
     end
-    
+
     # make CIJoe#build! and CIJoe#git_update a no-op so we don't overwrite our local changes
     # or local commits nor should we run tests.
-    def joe.build!
+    def joe.build!(branch=nil)
     end
   end
 
@@ -75,17 +76,16 @@ class TestCIJoeServer < Test::Unit::TestCase
     assert app.joe.building?
     assert_equal 302, last_response.status
   end
-  
+
   def test_post_does_not_build_on_branch_mismatch
     post "/", :payload => {"ref" => "refs/heads/dont_build"}.to_json
     assert !app.joe.building?
     assert_equal 302, last_response.status
   end
 
-  def test_post_builds_specific_branch 
-    app.joe.expects(:build!).with("branchname")
+  def test_post_builds_specific_branch
+    app.joe.expects(:build).with("branchname")
     post "/?branch=branchname", :payload => {"ref" => "refs/heads/master"}.to_json
-    assert app.joe.building?
     assert_equal 302, last_response.status
   end
 
@@ -94,7 +94,7 @@ class TestCIJoeServer < Test::Unit::TestCase
     assert app.joe.building?
     assert_equal 302, last_response.status
   end
-  
+
   def test_post_does_build_when_build_button_is_used
     post "/", :rebuild => true
     assert app.joe.building?
@@ -121,7 +121,7 @@ class TestCIJoeServer < Test::Unit::TestCase
 
   # Create a new, fake build. All we care about is status.
 
-  def build status
+  def build(status)
     CIJoe::Build.new "path", "user", "project", Time.now, Time.now,
       "deadbeef", status, "output", nil
   end

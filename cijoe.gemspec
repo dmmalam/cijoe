@@ -22,13 +22,17 @@ Gem::Specification.new do |s|
   s.add_runtime_dependency     'choice'
   s.add_runtime_dependency     'sinatra'
   s.add_runtime_dependency     'json'
-  s.add_runtime_dependency     'tinder', '>= 1.4.0'
+
+
+  s.add_development_dependency 'rcov'
+  s.add_development_dependency 'rdoc'
+  s.add_development_dependency 'rake'
   s.add_development_dependency 'rack-test'
   s.add_development_dependency 'mocha'
 
-   s.description       = <<desc
+   s.description       = <<DESC
   cijoe is a sinatra-based continuous integration server. It's like an
   old rusty pickup truck: it might be smelly and gross, but it gets the
   job done.
-desc
+DESC
 end

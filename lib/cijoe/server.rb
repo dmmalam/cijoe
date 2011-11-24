@@ -4,15 +4,14 @@ require 'json'
 
 class CIJoe
   class Server < Sinatra::Base
-    attr_reader :joe
-
     dir = File.dirname(File.expand_path(__FILE__))
 
-    set :views,  "#{dir}/views"
-    set :public, "#{dir}/public"
-    set :static, true
-    set :lock, true
+    set :views,         "#{dir}/views"
+    set :public_folder, "#{dir}/public"
+    set :static,        true
+    set :lock,          true
 
+    # restore current / last build state from disk.( lib/cijoe.rb )
     before { joe.restore }
 
     get '/ping' do
@@ -32,9 +31,9 @@ class CIJoe
         payload = JSON.parse(params[:payload])
         pushed_branch = payload["ref"].split('/').last
       end
-      
+
       # Only build if we were given an explicit branch via `?branch=blah`
-      # or the payload exists and the "ref" property matches our 
+      # or the payload exists and the "ref" property matches our
       # specified build branch.
       if params[:branch] || params[:rebuild] || pushed_branch == joe.git_branch
         joe.build(params[:branch])
@@ -79,7 +78,18 @@ class CIJoe
     def initialize(*args)
       super
       check_project
-      @joe = CIJoe.new(options.project_path)
+    end
+
+    def joe
+      self.class.joe
+    end
+
+    def self.joe
+      @joe ||= CIJoe.new(settings.project_path)
+    end
+
+    def self.joe=(joe)
+      @joe = joe
     end
 
     def self.start(host, port, project_path)
@@ -100,14 +110,16 @@ class CIJoe
         end
         puts "Using HTTP basic auth"
       end
-      set :project_path, Proc.new{project_path}
+      set :project_path, Proc.new{project_path}, true
     end
 
     def check_project
-      if options.project_path.nil? || !File.exists?(File.expand_path(options.project_path))
-        puts "Whoops! I need the path to a Git repo."
-        puts "  $ git clone git@github.com:username/project.git project"
-        abort "  $ cijoe project"
+      if settings.project_path.nil? || !File.exists?(File.expand_path(settings.project_path))
+        abort <<EOS
+Whoops! I need the path to a Git repo.
+$ git clone git@github.com:username/project.git project"
+$ cijoe project
+EOS
       end
     end
   end

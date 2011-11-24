@@ -1,5 +1,6 @@
 class CIJoe
   class Config
+
     def self.method_missing(command, *args)
       new(command, *args)
     end

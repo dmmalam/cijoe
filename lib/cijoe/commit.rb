@@ -5,11 +5,13 @@ class CIJoe
     end
 
     def author
-      raw_commit_lines.grep(/Author:/).first.split(':', 2)[-1]
+      line = raw_commit_lines.grep(/Author:/).first
+      line.split(/Author:\s*/)[-1]
     end
 
     def committed_at
-      raw_commit_lines.grep(/Date:/).first.split(':', 2)[-1]
+      line = raw_commit_lines.grep(/Date:/).first
+      line.split(/Date:\s*/)[-1]
     end
 
     def message
@@ -20,6 +22,7 @@ class CIJoe
       @raw_commit ||= `cd #{project_path} && git show #{sha}`.chomp
     end
 
+    private
     def raw_commit_lines
       @raw_commit_lines ||= raw_commit.split("\n")
     end

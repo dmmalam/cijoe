@@ -1,3 +1,7 @@
 class CIJoe
-  Version = VERSION = "0.9.2"
+  MAJOR = 0
+  MINOR = 9
+  TINY  = 2
+
+  VERSION = [MAJOR, MINOR, TINY].join('.')
 end
