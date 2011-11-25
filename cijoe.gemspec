@@ -19,7 +19,6 @@ Gem::Specification.new do |s|
 
   s.executables       = %w( cijoe )
 
-  s.add_runtime_dependency     'choice'
   s.add_runtime_dependency     'sinatra'
   s.add_runtime_dependency     'json'
 
