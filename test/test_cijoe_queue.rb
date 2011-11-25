@@ -1,7 +1,5 @@
 require 'helper'
 
-# $ git config --add cijoe.buildqueue true
-
 class TestCIJoeQueue < MiniTest::Unit::TestCase
   def test_empty_queue
     subject = CIJoe::Queue.new

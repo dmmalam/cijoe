@@ -1,17 +1,12 @@
 require 'helper'
 
-# Переместить в фикстуры
-#
-
 class TestCIJoeCommit < MiniTest::Unit::TestCase
   def commit_message
-    <<END
-    commit 291419e3ba46156f09ac31f267e2016640d286f6
+    "commit 291419e3ba46156f09ac31f267e2016640d286f6
     Author: Matt Colyer <matt@smallbatchinc.com>
     Date:   Thu Mar 31 12:45:41 2011 -0700
 
-    foo bar
-END
+    foo bar"
   end
 
   def setup
