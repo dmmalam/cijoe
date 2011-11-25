@@ -1,6 +1,9 @@
 require 'rubygems'
 require 'mocha'
 require 'test/unit'
+require 'minitest/unit'
+
+MiniTest::Unit.autorun
 
 ENV['RACK_ENV'] = 'test'
 
