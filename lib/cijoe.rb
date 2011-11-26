@@ -30,7 +30,7 @@ class CIJoe
     @user, @project = git_user_and_project
     @url = "http://github.com/#{@user}/#{@project}"
 
-    @last_build = nil
+    @last_build    = nil
     @current_build = nil
     @queue = Queue.new(!repo_config.buildqueue.to_s.empty?, true)
 
@@ -171,7 +171,7 @@ class CIJoe
 
   # restore current / last build state from disk.
   def restore
-    @last_build = read_build('last')
+    @last_build    = read_build('last')
     @current_build = read_build('current')
 
     Process.kill(0, @current_build.pid) if @current_build && @current_build.pid

@@ -25,4 +25,8 @@ class TestCIJoeCommit < MiniTest::Unit::TestCase
   def test_return_message
     assert_equal "foo bar", @commit.message
   end
+
+  def test_return_email
+    assert_equal "matt@smallbatchinc.com", @commit.email
+  end
 end

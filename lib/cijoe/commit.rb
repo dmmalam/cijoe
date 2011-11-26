@@ -4,6 +4,12 @@ class CIJoe
       "http://github.com/#{user}/#{project}/commit/#{sha}"
     end
 
+    def email
+      email = author.split(" ")[-1]
+      email.gsub!(/</, "")
+      email.gsub!(/>/, "")
+    end
+
     def author
       line = raw_commit_lines.grep(/Author:/).first
       line.split(/Author:\s*/)[-1]

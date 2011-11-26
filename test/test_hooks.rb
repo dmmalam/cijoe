@@ -10,12 +10,12 @@ class TestHooks < MiniTest::Unit::TestCase
     opts[:sha]     = "0000000000000000000000000000000000000000"
     opts[:output]  = "bar"
 
-    @project_path  = File.dirname(__FILE__) + '/dummy'
+    @project_path  = File.dirname(__FILE__)
     @hook          = CIJoe::Hook
   end
 
   def test_empty_output_with_not_existing_folder
-    output = hook.run('build-worked', '/foo/bar', opts)
+    output = hook.run('worked', '/foo/bar', opts)
     assert_equal nil, output
   end
 
@@ -24,23 +24,22 @@ class TestHooks < MiniTest::Unit::TestCase
     assert_equal nil, output
   end
 
-  # PENDING
-  # def test_empty_hook_env
-  #   opts = {}
-  #   output = hook.run('build-worked', project_path, opts)
-  #    assert_equal \
-  #     "Author: \n" \
-  #     "SHA: \n" \
-  #     "Message: \n" \
-  #     "OUTPUT: \n", output
-  # end
+  def test_empty_hook_env
+    opts = {}
+    output = hook.run('build-worked', project_path, opts, '/dummy')
+     assert_equal \
+      "Author: \n" \
+      "SHA: \n" \
+      "Message: \n" \
+      "OUTPUT: \n", output
+  end
 
-  # def test_run_hook
-  #   output = hook.run('build-worked', project_path, opts)
-  #   assert_equal \
-  #     "Author: foo\n" \
-  #     "SHA: 0000000000000000000000000000000000000000\n" \
-  #     "Message: quux\n" \
-  #     "OUTPUT: bar\n", output
-  # end
+  def test_run_hook
+    output = hook.run('build-worked', project_path, opts, '/dummy')
+    assert_equal \
+      "Author: foo\n" \
+      "SHA: 0000000000000000000000000000000000000000\n" \
+      "Message: quux\n" \
+      "OUTPUT: bar\n", output
+  end
 end
