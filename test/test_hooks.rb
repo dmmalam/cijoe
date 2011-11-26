@@ -1,76 +1,46 @@
 require 'helper'
 
-# mock files to true
-class File
-  class << self
-    alias orig_exists? exists?
-    alias orig_executable? executable?
-
-    def exists?(f)
-      return true if $hook_override
-      orig_exists? f
-    end
-    def executable?(f)
-      return true if $hook_override
-      orig_executable? f
-    end
-  end
-end
-
-# #mock file to be the file I want
-class CIJoe
-  attr_writer :last_build
-  alias orig_path_in_project path_in_project
-  alias orig_git_user_and_project git_user_and_project
-
-  def path_in_project(f)
-    return '/tmp/test' if $hook_override
-    orig_path_in_project(f)
-  end
-
-  def git_user_and_project
-    return ['mine','yours'] if $hook_override
-    orig_git_user_and_project
-  end
-end
-
 class TestHooks < MiniTest::Unit::TestCase
-  attr_reader :cijoe
-
-  def teardown
-    $hook_override = nil
-  end
+  attr_reader :hook, :opts, :project_path
 
   def setup
-    $hook_override = true
-    open("/tmp/test",'w') do |file|
-      file.write "echo $test\n"
-      file.write "echo $AUTHOR\n"
-      file.write "export test=foo\n"
-    end
-    File.chmod(0777,'/tmp/test')
+    @opts = {}
+    opts[:message] = "quux"
+    opts[:author]  = "foo"
+    opts[:sha]     = "0000000000000000000000000000000000000000"
+    opts[:output]  = "bar"
 
-    @cijoe = CIJoe.new('/tmp')
-    @cijoe.last_build = CIJoe::Build.new "path", "user", "project", Time.now, Time.now, "deadbeef", :failed, "output", nil
-    @cijoe.last_build.commit.stubs(:raw_commit).returns("Author: commit author\nDate: now")
+    @project_path  = File.dirname(__FILE__) + '/dummy'
+    @hook          = CIJoe::Hook
   end
 
-  def test_leave_env_intact
-    ENV['AUTHOR'] = 'foo'
-    cijoe.run_hook("/tmp/test")
-    assert ENV.size != 0, 'ENV is empty but should not be'
-    assert ENV['AUTHOR'] == 'foo', 'ENV munged a value'
+  def test_empty_output_with_not_existing_folder
+    output = hook.run('build-worked', '/foo/bar', opts)
+    assert_equal nil, output
   end
 
-  def test_empty_hook_env
-    ENV["test"] = 'should not be shown'
-    output = cijoe.run_hook("/tmp/test")
-    assert_equal "\ncommit author\n", output
+  def test_empty_output_with_not_existing_hook
+    output = hook.run('foobar', project_path, opts)
+    assert_equal nil, output
   end
 
-  def test_hook_munge_env
-    ENV['test'] = 'bar'
-    output = cijoe.run_hook("/tmp/test")
-    assert ENV['test'] == 'bar'
-  end
+  # PENDING
+  # def test_empty_hook_env
+  #   opts = {}
+  #   output = hook.run('build-worked', project_path, opts)
+  #    assert_equal \
+  #     "Author: \n" \
+  #     "SHA: \n" \
+  #     "Message: \n" \
+  #     "OUTPUT: \n", output
+  # end
+
+  # def test_run_hook
+  #   output = hook.run('build-worked', project_path, opts)
+  #   assert_equal \
+  #     "Author: foo\n" \
+  #     "SHA: 0000000000000000000000000000000000000000\n" \
+  #     "Message: quux\n" \
+  #     "OUTPUT: bar\n", output
+  # end
 end

@@ -37,4 +37,5 @@ OptionParser.new do |opts|
   end
 end.parse!
 
-CIJoe::Server.start(options[:host], options[:port], File.expand_path(ARGV.first.to_s))
+project_path = ARGV.first
+CIJoe::Server.start(options[:host], options[:port], File.expand_path(project_path))

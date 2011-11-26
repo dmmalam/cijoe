@@ -1,0 +1,7 @@
+#!/bin/sh
+
+echo "\
+Author: $AUTHOR
+SHA: $SHA
+Message: $MESSAGE
+OUTPUT: $OUTPUT"

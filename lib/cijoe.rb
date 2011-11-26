@@ -19,6 +19,7 @@ require 'cijoe/commit'
 require 'cijoe/build'
 require 'cijoe/server'
 require 'cijoe/queue'
+require 'cijoe/hook'
 
 class CIJoe
   attr_reader :user, :project, :url, :current_build, :last_build
@@ -159,30 +160,13 @@ class CIJoe
 
   # massage our repo
   def run_hook(hook)
-    if File.exists?(file=path_in_project(".git/hooks/#{hook}")) && File.executable?(file)
-      data =
-        if @last_build && @last_build.commit
-          {
-            "MESSAGE" => @last_build.commit.message,
-            "AUTHOR" => @last_build.commit.author,
-            "SHA" => @last_build.commit.sha,
-            "OUTPUT" => @last_build.env_output
-          }
-        else
-          {}
-        end
+    opts = {}
+    opts[:message] = @last_build.commit.message,
+    opts[:author]  = @last_build.commit.author,
+    opts[:sha]     = @last_build.commit.sha,
+    opts[:output]  = @last_build.env_output
 
-      orig_ENV = ENV.to_hash
-      ENV.clear
-      data.each{ |k, v| ENV[k] = v }
-      # output = `cd #{@project_path} && ./#{file}`
-      output = `cd #{@project_path} && sh #{file}`
-
-
-      ENV.clear
-      orig_ENV.to_hash.each{ |k, v| ENV[k] = v}
-      output
-    end
+    Hook.run(hook, @project_path, opts)
   end
 
   # restore current / last build state from disk.
