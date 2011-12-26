@@ -129,7 +129,7 @@ class CIJoe
 
     status == 0 ? build_worked(output) : build_failed('', output)
   rescue Object => e
-    puts "Exception building: #{e.message} (#{e.class})"
+    puts "Exception building: #{e.inspect}"
     build_failed('', e.to_s)
   end
 
@@ -161,10 +161,12 @@ class CIJoe
   # massage our repo
   def run_hook(hook)
     opts = {}
-    opts[:message] = @last_build.commit.message,
-    opts[:author]  = @last_build.commit.author,
-    opts[:sha]     = @last_build.commit.sha,
-    opts[:output]  = @last_build.env_output
+    if @last_build && @last_build.commit
+      opts[:message] = @last_build.commit.message,
+      opts[:author]  = @last_build.commit.author,
+      opts[:sha]     = @last_build.commit.sha,
+      opts[:output]  = @last_build.env_output
+   end
 
     Hook.run(hook, @project_path, opts)
   end

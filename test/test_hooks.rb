@@ -25,8 +25,7 @@ class TestHooks < MiniTest::Unit::TestCase
   end
 
   def test_empty_hook_env
-    opts = {}
-    output = hook.run('build-worked', project_path, opts, '/dummy')
+    output = hook.run('build-worked', project_path, {}, '/dummy')
      assert_equal \
       "Author: \n" \
       "SHA: \n" \
