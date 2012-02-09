@@ -83,6 +83,12 @@ class TestCIJoeServer < MiniTest::Unit::TestCase
     assert_equal 302, last_response.status
   end
 
+  def test_post_does_not_build_on_author_ci
+    post "/", :payload => {"ref" => "refs/heads/master", "commits" => [{"author" =>{"name" => "CI"}}]}.to_json
+    assert !app.joe.building?
+    assert_equal 302, last_response.status
+  end
+
   def test_post_builds_specific_branch
     app.joe.expects(:build).with("branchname")
     post "/?branch=branchname", :payload => {"ref" => "refs/heads/master"}.to_json

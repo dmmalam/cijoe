@@ -28,15 +28,26 @@ class CIJoe
     end
 
     post '/?' do
+      name = nil
       unless params[:rebuild]
         payload = JSON.parse(params[:payload])
         pushed_branch = payload["ref"].split('/').last
+        c = payload["commits"]
+        if c
+          arr = c[0]
+          if arr
+            a = arr["author"]
+            if a
+              name = a["name"]
+            end
+          end
+        end
       end
 
       # Only build if we were given an explicit branch via `?branch=blah`
       # or the payload exists and the "ref" property matches our
       # specified build branch.
-      if params[:branch] || params[:rebuild] || pushed_branch == joe.git_branch
+      if params[:branch] || params[:rebuild] || ((!name || name != "CI") && (pushed_branch == joe.git_branch))
         joe.build(params[:branch])
       end
 
